@@ -1,0 +1,30 @@
+{
+  "molecule": ["p53", "M_c", "M_n", "PTEN"], 
+  "parameters": {
+    "p1": 8.8,
+    "p2b": 440,
+    "p3b": 100,
+    "d1": 1.375e-14,
+    "d2b": 1.375e-4,
+    "d3": 3e-5,
+    "k1": 1.925e-4,
+    "k2": 100000,
+    "k3": 150000},
+  "scenarios": {
+    "A – brak uszkodzeń DNA":  { "sirna": false, "pten_off": false, "dna_ok": true },
+    "B – uszkodzone DNA":      { "sirna": false, "pten_off": false, "dna_ok": false },
+    "C – nowotwór (PTEN off)": { "sirna": false, "pten_off": true,  "dna_ok": false },
+    "D – terapia (siRNA on)":  { "sirna": true,  "pten_off": true,  "dna_ok": false }},
+  "reactions": [
+    {"rate": "p1", "stoich": [ 1,  0,  0,  0]},
+    {"rate": "d1*p53*M_n**2", "stoich": [-1,  0,  0,  0]},
+    {"rate": "p2b*(0.02 if sirna else 1.0)*p53**4/(p53**4 + k2**4)", "stoich": [ 0,  1,  0,  0]},
+    {"rate": "k1*(k3**2/(k3**2 + PTEN**2))*M_c", "stoich": [ 0, -1,  1,  0]},
+    {"rate": "d2b*(0.1 if dna_ok else 1.0)*M_c", "stoich": [ 0, -1,  0,  0]},
+    {"rate": "k1*(k3**2/(k3**2 + PTEN**2))*M_c", "stoich": [ 0,  0,  1,  0]},
+    {"rate": "d2b*(0.1 if dna_ok else 1.0)*M_n", "stoich": [ 0,  0, -1,  0]},
+    {"rate": "p3b*(0 if pten_off else 1.0)*p53**4/(p53**4 + k2**4)", "stoich": [ 0,  0,  0,  1]},
+    {"rate": "d3*PTEN", "stoich": [ 0,  0,  0, -1] }
+  ],
+  "initial_state": [100, 50, 50, 50]
+}
